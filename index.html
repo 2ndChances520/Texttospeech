@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TeamLegacy // KOKORO LIVE TTS</title>
+  <style>
+    :root{
+      --bg:#05070a;
+      --bg2:#0a1016;
+      --panel:#0d141d;
+      --panel2:#111b26;
+      --line:#1d3144;
+      --text:#d8ecff;
+      --muted:#8ea8bf;
+      --cyan:#73d7ff;
+      --cyan2:#36b8f2;
+      --green:#8cff9b;
+      --amber:#ffd36b;
+      --red:#ff7f7f;
+      --radius:18px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --shadow:0 0 0 1px rgba(115,215,255,.08), 0 10px 40px rgba(0,0,0,.45), inset 0 0 60px rgba(55,130,180,.04);
+    }
+    * { box-sizing:border-box; }
+    html, body {
+      margin:0;
+      min-height:100%;
+      background:
+        radial-gradient(circle at 20% 15%, rgba(54,184,242,.08), transparent 22%),
+        radial-gradient(circle at 80% 10%, rgba(140,255,155,.05), transparent 22%),
+        linear-gradient(180deg, #030508 0%, #081019 100%);
+      color:var(--text);
+      font-family:var(--sans);
+    }
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      background-image:
+        linear-gradient(rgba(115,215,255,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(115,215,255,.04) 1px, transparent 1px);
+      background-size: 32px 32px;
+      mask-image: radial-gradient(circle at center, rgba(255,255,255,.75), transparent 85%);
+      opacity:.7;
+    }
+    .app{
+      position:relative;
+      z-index:1;
+      max-width:1200px;
+      margin:0 auto;
+      padding:24px;
+    }
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:16px;
+      flex-wrap:wrap;
+      margin-bottom:22px;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:16px;
+    }
+    .seal{
+      width:64px;height:64px;border-radius:50%;
+      display:grid;place-items:center;
+      border:1px solid rgba(115,215,255,.18);
+      background:linear-gradient(145deg, #0b121a, #111a25);
+      box-shadow:0 0 30px rgba(54,184,242,.12), inset 0 0 25px rgba(115,215,255,.06);
+      color:var(--cyan);
+      font-size:24px;
+      font-weight:900;
+    }
+    .brand h1{
+      margin:0;
+      font-size:1.35rem;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+    }
+    .brand .sub{
+      margin-top:5px;
+      color:var(--muted);
+      font-size:.92rem;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      font-family:var(--mono);
+    }
+    .pill{
+      border:1px solid rgba(115,215,255,.15);
+      background: linear-gradient(180deg, rgba(16,29,42,.9), rgba(9,17,24,.9));
+      padding:10px 14px;
+      border-radius:999px;
+      color:var(--muted);
+      font-family:var(--mono);
+      font-size:.82rem;
+      letter-spacing:.06em;
+      box-shadow: var(--shadow);
+    }
+    .pill strong{ color:var(--cyan); }
+    .layout{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:22px;
+    }
+    .panel{
+      background:linear-gradient(180deg, rgba(14,22,31,.92), rgba(8,13,19,.92));
+      border:1px solid rgba(115,215,255,.12);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .panel-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:14px;
+      padding:16px 18px;
+      border-bottom:1px solid rgba(115,215,255,.08);
+      background: linear-gradient(180deg, rgba(17,28,40,.88), rgba(10,16,24,.88));
+    }
+    .panel-title{
+      font-size:.95rem;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+      font-weight:800;
+    }
+    .panel-tag{
+      color:var(--muted);
+      font-family:var(--mono);
+      font-size:.76rem;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+    .panel-body{ padding:18px; }
+    .stack{ display:grid; gap:16px; }
+    label{
+      display:block;
+      font-size:.8rem;
+      text-transform:uppercase;
+      letter-spacing:.14em;
+      color:var(--muted);
+      margin-bottom:8px;
+      font-weight:700;
+    }
+    textarea, select, input{
+      width:100%;
+      border:none;
+      outline:none;
+      background: linear-gradient(180deg, rgba(11,19,27,.95), rgba(6,12,18,.95));
+      color:var(--text);
+      border:1px solid rgba(115,215,255,.14);
+      border-radius:14px;
+      padding:14px;
+      font-size:1rem;
+    }
+    textarea{
+      min-height:240px;
+      resize:vertical;
+      line-height:1.5;
+    }
+    .grid-2{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+    }
+    .btn-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+    }
+    button{
+      appearance:none;
+      border:none;
+      cursor:pointer;
+      padding:13px 16px;
+      border-radius:14px;
+      font-weight:800;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      transition:transform .15s ease, opacity .15s ease;
+    }
+    button:hover{ transform:translateY(-1px); }
+    .btn-primary{
+      background: linear-gradient(180deg, rgba(77,213,255,.95), rgba(26,153,214,.95));
+      color:#031019;
+    }
+    .btn-secondary{
+      background: linear-gradient(180deg, rgba(20,31,45,.96), rgba(12,19,27,.96));
+      color:var(--text);
+      border:1px solid rgba(115,215,255,.14);
+    }
+    .btn-danger{
+      background: linear-gradient(180deg, rgba(80,26,26,.95), rgba(54,14,14,.95));
+      color:#ffd3d3;
+      border:1px solid rgba(255,127,127,.18);
+    }
+    .hud-card{
+      border:1px solid rgba(115,215,255,.11);
+      border-radius:16px;
+      padding:14px;
+      background: linear-gradient(180deg, rgba(13,22,30,.95), rgba(9,15,22,.95));
+      margin-bottom:14px;
+    }
+    .hud-title{
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.12em;
+      font-size:.78rem;
+      font-weight:800;
+      margin-bottom:10px;
+    }
+    .big-readout{
+      font-size:1.3rem;
+      font-weight:800;
+      color:var(--cyan);
+      letter-spacing:.04em;
+      word-break:break-word;
+      font-family:var(--mono);
+    }
+    .meter{
+      height:10px;
+      width:100%;
+      background:#07111a;
+      border-radius:999px;
+      border:1px solid rgba(115,215,255,.08);
+      overflow:hidden;
+    }
+    .meter > span{
+      display:block;
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg, rgba(54,184,242,.8), rgba(140,255,155,.8));
+      transition:width .2s ease;
+    }
+    .log{
+      min-height:180px;
+      max-height:280px;
+      overflow:auto;
+      border-radius:14px;
+      background:#050a10;
+      border:1px solid rgba(115,215,255,.1);
+      padding:12px;
+      font-family:var(--mono);
+      font-size:.84rem;
+      line-height:1.5;
+      color:#a8c6db;
+    }
+    .ok{ color:var(--green); }
+    .warn{ color:var(--amber); }
+    .err{ color:var(--red); }
+    .accent{ color:var(--cyan); }
+    .small{ font-size:.84rem; color:var(--muted); line-height:1.55; }
+    audio{ width:100%; margin-top:8px; }
+    .banner{
+      margin-bottom:18px;
+      border:1px solid rgba(255,211,107,.14);
+      background:linear-gradient(180deg, rgba(48,37,14,.35), rgba(32,22,8,.18));
+      color:#ffe3a0;
+      padding:12px 14px;
+      border-radius:14px;
+      font-size:.92rem;
+      line-height:1.5;
+    }
+    @media (max-width: 980px){ .layout{ grid-template-columns:1fr; } }
+    @media (max-width: 680px){ .grid-2{ grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="topbar">
+      <div class="brand">
+        <div class="seal">▲</div>
+        <div>
+          <h1>TeamLegacy Voice Operations</h1>
+          <div class="sub">Browser-local Kokoro speech synthesis console</div>
+        </div>
+      </div>
+      <div class="pill">STATUS: <strong id="topStatus">STANDBY</strong></div>
+    </div>
+
+    <div class="banner">
+      Browser-local Kokoro speech synthesis console. First run may take a while because the model must download and cache in the browser.
+    </div>
+
+    <div class="layout">
+      <section class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Text Payload Control</div>
+            <div class="panel-tag">Live synthesis through Kokoro.js</div>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="stack">
+            <div>
+              <label for="inputText">Text Payload</label>
+              <textarea id="inputText">TeamLegacy operations are now online. Voice synthesis is active.</textarea>
+            </div>
+
+            <div class="grid-2">
+              <div>
+                <label for="voiceSelect">Voice Profile</label>
+                <select id="voiceSelect">
+                  <option value="af_bella">AF_BELLA</option>
+                  <option value="af_heart">AF_HEART</option>
+                  <option value="af_sarah">AF_SARAH</option>
+                  <option value="am_adam">AM_ADAM</option>
+                  <option value="am_michael">AM_MICHAEL</option>
+                  <option value="bf_emma">BF_EMMA</option>
+                  <option value="bm_george">BM_GEORGE</option>
+                </select>
+              </div>
+              <div>
+                <label for="dtypeSelect">Model Precision</label>
+                <select id="dtypeSelect">
+                  <option value="q8" selected>q8</option>
+                  <option value="fp16">fp16</option>
+                  <option value="fp32">fp32</option>
+                  <option value="q4">q4</option>
+                  <option value="q4f16">q4f16</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="btn-row">
+              <button class="btn-secondary" id="btnInit">Initialize Engine</button>
+              <button class="btn-primary" id="btnSpeak">Generate Speech</button>
+              <button class="btn-secondary" id="btnPlay">Play</button>
+              <button class="btn-secondary" id="btnDownload">Download WAV</button>
+              <button class="btn-danger" id="btnStop">Stop</button>
+            </div>
+
+            <div>
+              <label>Playback Monitor</label>
+              <audio id="audioPlayer" controls></audio>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside>
+        <section class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title">Operations Telemetry</div>
+              <div class="panel-tag">Model load and runtime diagnostics</div>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="hud-card">
+              <div class="hud-title">Engine State</div>
+              <div class="big-readout" id="engineState">UNINITIALIZED</div>
+            </div>
+
+            <div class="hud-card">
+              <div class="hud-title">Load Progress</div>
+              <div class="meter"><span id="progressBar"></span></div>
+              <div class="small" style="margin-top:8px;">Progress: <span id="progressText">0%</span></div>
+            </div>
+
+            <div class="hud-card">
+              <div class="hud-title">Runtime Notes</div>
+              <div class="small" id="runtimeNotes">Awaiting initialization.</div>
+            </div>
+
+            <div class="hud-card">
+              <div class="hud-title">Mission Log</div>
+              <div class="log" id="logBox"></div>
+            </div>
+          </div>
+        </section>
+      </aside>
+    </div>
+  </div>
+
+  <script type="module">
+    const els = {
+      inputText: document.getElementById('inputText'),
+      voiceSelect: document.getElementById('voiceSelect'),
+      dtypeSelect: document.getElementById('dtypeSelect'),
+      btnInit: document.getElementById('btnInit'),
+      btnSpeak: document.getElementById('btnSpeak'),
+      btnPlay: document.getElementById('btnPlay'),
+      btnDownload: document.getElementById('btnDownload'),
+      btnStop: document.getElementById('btnStop'),
+      audioPlayer: document.getElementById('audioPlayer'),
+      logBox: document.getElementById('logBox'),
+      topStatus: document.getElementById('topStatus'),
+      engineState: document.getElementById('engineState'),
+      progressBar: document.getElementById('progressBar'),
+      progressText: document.getElementById('progressText'),
+      runtimeNotes: document.getElementById('runtimeNotes'),
+    };
+
+    const state = {
+      tts: null,
+      audioUrl: null,
+      audioBlob: null,
+      audioContext: null,
+      audioBuffer: null,
+    };
+
+    function log(message, type = 'accent') {
+      const div = document.createElement('div');
+      div.className = type;
+      div.textContent = '[' + new Date().toLocaleTimeString() + '] ' + message;
+      els.logBox.prepend(div);
+      console.log(message);
+    }
+
+    function setStatus(s) {
+      els.topStatus.textContent = s;
+    }
+
+    function setEngineState(s) {
+      els.engineState.textContent = s;
+    }
+
+    function setProgress(v) {
+      const n = Math.max(0, Math.min(100, Math.round(v)));
+      els.progressBar.style.width = n + '%';
+      els.progressText.textContent = n + '%';
+    }
+
+    function cleanupUrl() {
+      if (state.audioUrl) {
+        URL.revokeObjectURL(state.audioUrl);
+        state.audioUrl = null;
+      }
+    }
+
+    async function pcmToWavBlob(float32Array, sampleRate = 24000) {
+      const numChannels = 1;
+      const bytesPerSample = 2;
+      const blockAlign = numChannels * bytesPerSample;
+      const byteRate = sampleRate * blockAlign;
+      const dataSize = float32Array.length * bytesPerSample;
+      const buffer = new ArrayBuffer(44 + dataSize);
+      const view = new DataView(buffer);
+
+      function writeString(offset, str) {
+        for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
+      }
+
+      writeString(0, 'RIFF');
+      view.setUint32(4, 36 + dataSize, true);
+      writeString(8, 'WAVE');
+      writeString(12, 'fmt ');
+      view.setUint32(16, 16, true);
+      view.setUint16(20, 1, true);
+      view.setUint16(22, numChannels, true);
+      view.setUint32(24, sampleRate, true);
+      view.setUint32(28, byteRate, true);
+      view.setUint16(32, blockAlign, true);
+      view.setUint16(34, 16, true);
+      writeString(36, 'data');
+      view.setUint32(40, dataSize, true);
+
+      let offset = 44;
+      for (let i = 0; i < float32Array.length; i++) {
+        const s = Math.max(-1, Math.min(1, float32Array[i]));
+        view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+        offset += 2;
+      }
+
+      return new Blob([buffer], { type: 'audio/wav' });
+    }
+
+    async function initializeEngine() {
+      try {
+        setStatus('INITIALIZING');
+        setEngineState('BOOTSTRAPPING');
+        setProgress(5);
+        els.runtimeNotes.textContent = 'Loading Kokoro.js runtime and model...';
+        log('Loading Kokoro.js ESM module...', 'accent');
+
+        const { KokoroTTS } = await import('https://esm.sh/kokoro-js');
+        setProgress(25);
+        log('Kokoro.js module loaded.', 'ok');
+
+        const dtype = els.dtypeSelect.value;
+        log('Loading onnx-community/Kokoro-82M-ONNX with dtype=' + dtype + ' ...', 'accent');
+
+        state.tts = await KokoroTTS.from_pretrained(
+          'onnx-community/Kokoro-82M-ONNX',
+          {
+            dtype,
+            device: 'wasm',
+            progress_callback: (p) => {
+              if (p && typeof p.progress === 'number') {
+                setProgress(p.progress * 100);
+              }
+            }
+          }
+        );
+
+        setProgress(100);
+        setStatus('READY');
+        setEngineState('READY');
+        els.runtimeNotes.textContent = 'Engine initialized. Model should now be cached for faster reuse.';
+        log('Kokoro engine initialized successfully.', 'ok');
+      } catch (err) {
+        console.error(err);
+        setStatus('FAULT');
+        setEngineState('ERROR');
+        setProgress(0);
+        els.runtimeNotes.textContent = 'Initialization failed. See log and browser console.';
+        log('Initialization failure: ' + (err?.message || err), 'err');
+      }
+    }
+
+    async function generateSpeech() {
+      try {
+        const text = els.inputText.value.trim();
+        const voice = els.voiceSelect.value;
+
+        if (!text) {
+          log('No text supplied.', 'warn');
+          return;
+        }
+
+        if (!state.tts) {
+          log('Engine not initialized. Auto-initializing now.', 'warn');
+          await initializeEngine();
+          if (!state.tts) return;
+        }
+
+        setStatus('SYNTHESIZING');
+        setEngineState('PROCESSING');
+        setProgress(10);
+        els.runtimeNotes.textContent = 'Generating speech. First run can be slow.';
+
+        log('Generating speech with voice=' + voice + ' ...', 'accent');
+
+        const result = await state.tts.generate(text, {
+          voice
+        });
+
+        setProgress(80);
+
+        let audio = null;
+        let sampleRate = 24000;
+
+        if (result?.audio instanceof Float32Array) {
+          audio = result.audio;
+          if (typeof result.sample_rate === 'number') sampleRate = result.sample_rate;
+        } else if (result instanceof Float32Array) {
+          audio = result;
+        } else if (result?.data instanceof Float32Array) {
+          audio = result.data;
+          if (typeof result.sample_rate === 'number') sampleRate = result.sample_rate;
+        } else {
+          throw new Error('Unexpected Kokoro output shape.');
+        }
+
+        state.audioBlob = await pcmToWavBlob(audio, sampleRate);
+        cleanupUrl();
+        state.audioUrl = URL.createObjectURL(state.audioBlob);
+        els.audioPlayer.src = state.audioUrl;
+        els.audioPlayer.load();
+
+        setProgress(100);
+        setStatus('AUDIO READY');
+        setEngineState('READY');
+        els.runtimeNotes.textContent = 'Speech generated successfully.';
+        log('Speech generated and attached to audio player.', 'ok');
+      } catch (err) {
+        console.error(err);
+        setStatus('FAULT');
+        setEngineState('ERROR');
+        setProgress(0);
+        els.runtimeNotes.textContent = 'Speech generation failed. Check console.';
+        log('Speech generation failure: ' + (err?.message || err), 'err');
+      }
+    }
+
+    function playAudio() {
+      if (!els.audioPlayer.src) {
+        log('No audio available to play.', 'warn');
+        return;
+      }
+      els.audioPlayer.play().catch(err => {
+        log('Playback blocked: ' + (err?.message || err), 'err');
+      });
+    }
+
+    function stopAudio() {
+      els.audioPlayer.pause();
+      els.audioPlayer.currentTime = 0;
+      setStatus(state.tts ? 'READY' : 'STANDBY');
+      setEngineState(state.tts ? 'READY' : 'UNINITIALIZED');
+      log('Playback stopped.', 'warn');
+    }
+
+    function downloadAudio() {
+      if (!state.audioBlob) {
+        log('No WAV available for download.', 'warn');
+        return;
+      }
+      const a = document.createElement('a');
+      const url = URL.createObjectURL(state.audioBlob);
+      a.href = url;
+      a.download = 'teamlegacy-kokoro-output.wav';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      log('WAV exported.', 'ok');
+    }
+
+    els.btnInit.addEventListener('click', initializeEngine);
+    els.btnSpeak.addEventListener('click', generateSpeech);
+    els.btnPlay.addEventListener('click', playAudio);
+    els.btnStop.addEventListener('click', stopAudio);
+    els.btnDownload.addEventListener('click', downloadAudio);
+
+    log('TeamLegacy console online.', 'ok');
+    log('Use a local web server. Do not open via file://', 'warn');
+  </script>
+</body>
+</html>
